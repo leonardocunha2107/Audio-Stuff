@@ -4,7 +4,6 @@ import scipy.signal as signal
 import numpy as np
 import matplotlib.pyplot as plt
 import os.path as path
-
 class Wave:
     """Represents a sound in terms of a numpy array"""
         
@@ -31,6 +30,10 @@ class Wave:
         self.__sample_width=seg.sample_width
         self.__frame_rate=seg.frame_rate
         self.__n_channels=seg.channels
+        seg=seg.split_to_mono()
+        dtype={1:np.int8,2:np.int16}[self.__sample_width]
+        self.data=np.array([s.get_array_of_samples() for s in seg],dtype=dtype)
+        assert(self.data.shape[1]==seg.frame_count())
         
         
 def clean_sound(fmin=None,fmax=None,data='ode to joy.mp3'):
@@ -41,7 +44,7 @@ def clean_sound(fmin=None,fmax=None,data='ode to joy.mp3'):
     s=np.array(sound.split_to_mono()[0].get_array_of_samples())
     print(len(s))
     fs=sound.frame_rate
-    f,t,sxx=signal.stft(s,fs=fs,)
+    f,t,sxx=signal.stft(s,fs=fs)
     #sxx=np.where(sxx<=1,sxx,0)
     """if fmin:
         K=np.sum(f<fmin)+1
